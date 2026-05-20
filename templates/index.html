@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pipeline CI/CD Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Section */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Dashboard Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* عمودين متساويين (يمين ويسار) */
+            grid-template-rows: auto auto;  /* الصف العلوي والاسفل */
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem; /* زيادة الحواف الداخلية قليلاً */
+            transition: transform 0.2s ease;
+            width: 100%;
+            /*text-align: center;  توسيط العناوين */
+        }
+
+        .card:nth-child(3) { /* هذا يستهدف الـ card الثالث (Console) */
+            grid-column: 1 / -1; /* يمتد من العمود الأول إلى الأخير */
+            width: 100%;
+            text-align: left; /* Logs يفضل أن تكون محاذاة لليسار */
+}
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Pipeline Visuals */
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.3); /* لون خلفية خفيف للتمييز */
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--bg-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-green);
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Technical Stats */
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .tech-tag {
+            background: var(--bg-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Log Console Simulation */
+        .console {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        
+        .log-line { margin-bottom: 4px; }
+        .log-success { color: var(--accent-green); }
+        .log-info { color: var(--accent-blue); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-area">
+              <div class="logo-icon">DE</div>
+              <div>
+                  <h1>Automated Data Pipeline Deployment</h1>
+                  <div style="font-size: 0.9rem; color: var(--accent-blue); font-weight: 600;">
+                      By: Abdelrahman Maged
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+                      CI/CD Course Assessment • Data Engineering Track
+                  </div>
+              </div>
+          </div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                System Operational
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            
+            <!-- Card 1: Pipeline Status -->
+            <div class="card">
+                <h3>Live Pipeline Status</h3>
+                
+                <div class="pipeline-step">
+                    <div class="step-icon">1</div>
+                    <div class="step-info">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Source Control (GitHub)</span>
+                            <span style="font-size:0.8rem; color:var(--accent-green)">Success</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-icon">2</div>
+                    <div class="step-info">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Build & Dockerize</span>
+                            <span style="font-size:0.8rem; color:var(--accent-green)">Success</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-icon">3</div>
+                    <div class="step-info">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Automated Testing</span>
+                            <span style="font-size:0.8rem; color:var(--accent-green)">Success</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                    </div>
+                </div>
+
+                <div class="pipeline-step">
+                    <div class="step-icon">4</div>
+                    <div class="step-info">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Container Deployment</span>
+                            <span style="font-size:0.8rem; color:var(--accent-blue)">Running</span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: System Metrics -->
+            <div class="card">
+                <h3>Infrastructure Metrics</h3>
+                <div class="stat-row">
+                    <span>Container Runtime</span>
+                    <span class="stat-value">Docker Engine</span>
+                </div>
+                <div class="stat-row">
+                    <span>Orchestrator</span>
+                    <span class="stat-value">Jenkins Pipeline</span>
+                </div>
+                <div class="stat-row">
+                    <span>Language</span>
+                    <span class="stat-value">Python 3.11</span>
+                </div>
+                <div class="stat-row">
+                    <span>Last Build</span>
+                    <span class="stat-value" id="build-time">Just Now</span>
+                </div>
+                <div class="stat-row">
+                    <span>Test Coverage</span>
+                    <span class="stat-value">100%</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Terminal/Logs -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h3>Execution Logs (Real-time)</h3>
+                <div class="console" id="console-output">
+                    <div class="log-line log-info">[INFO] Jenkins agent connected...</div>
+                    <div class="log-line log-info">[INFO] Cloning repository from GitHub...</div>
+                    <div class="log-line log-success">[SUCCESS] Checkout completed. Branch: main</div>
+                    <div class="log-line log-info">[INFO] Building Docker image: data-pipeline-app:latest</div>
+                    <div class="log-line log-info">[INFO] Running pytest suite...</div>
+                    <div class="log-line log-success">[SUCCESS] 3 tests passed, 0 failures</div>
+                    <div class="log-line log-info">[INFO] Deploying container to port 5000...</div>
+                    <div class="log-line log-success">[SUCCESS] Application is live and serving requests.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Automated CI/CD Workflow — Data Engineering (CI/CD Course)</p>
+            <div class="tech-stack">
+                <span class="tech-tag">Flask</span>
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">Jenkins</span>
+                <span class="tech-tag">GitHub Actions</span>
+                <span class="tech-tag">Python</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate a live update for the screenshot effect
+        setTimeout(() => {
+            consoleOutput = document.getElementById('console-output');
+            const newLine = document.createElement('div');
+            newLine.className = 'log-line log-info';
+            newLine.innerText = `[INFO] System health check: OK (${Math.floor(Math.random() * 50) + 10}ms)`;
+            consoleOutput.appendChild(newLine);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }, 2000);
+
+        // Update build time
+        const now = new Date();
+        document.getElementById('build-time').innerText = now.toLocaleTimeString();
+    </script>
+</body>
+</html>
