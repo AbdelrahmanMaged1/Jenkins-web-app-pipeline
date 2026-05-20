@@ -51,7 +51,7 @@ CI-CD_PROJECT/
 ├── Dockerfile
 ├── Jenkinsfile
 └── requirements.txt
-
+```
 
 
 ---
