@@ -1,4 +1,4 @@
-Pipeline{
+pipeline{
     agent any 
 
     stages{
@@ -21,7 +21,7 @@ Pipeline{
         stage('Run Tests'){
             steps{
                 echo '===== unning pytest inside container ====='
-                sh 'docker run -rm ci-cd-project python -m pytest test/ -v'
+                sh 'docker run --rm ci-cd-project python -m pytest tests/ -v'
 
             }
         }
