@@ -1,6 +1,3 @@
-# Jenkins-web-app-pipeline
-
-````markdown
 # CI/CD Flask Web Application using Docker & Jenkins
 
 A simple CI/CD project built for the ITI CI/CD course assessment.  
@@ -256,5 +253,3 @@ This project demonstrates understanding of:
 **Abdelrahman Maged**
 ITI – Data Engineering Track
 
-
-```
