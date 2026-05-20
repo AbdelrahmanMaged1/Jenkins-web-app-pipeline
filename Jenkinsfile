@@ -13,7 +13,7 @@ pipeline{
         stage('Build Docker Image'){
             steps{
                 echo '===== Building Docker image ====='
-                sh 'docker build -t ci-cd-project .'
+                sh 'docker build --pull=false -t ci-cd-project .'
 
             }
         }
