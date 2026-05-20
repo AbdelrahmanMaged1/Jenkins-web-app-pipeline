@@ -4,7 +4,7 @@ pipeline{
     stages{
         stage('Clone Repository'){
             steps{
-                echo '===== Pulling source code ====='
+                echo ' ============================== Pulling source code ============================== '
                 checkout scm
 
             }
@@ -12,7 +12,7 @@ pipeline{
 
         stage('Build Docker Image'){
             steps{
-                echo '===== Building Docker image ====='
+                echo '============================== Building Docker image =============================='
                 sh 'docker build --pull=false -t ci-cd-project .'
 
             }
@@ -20,7 +20,7 @@ pipeline{
 
         stage('Run Tests'){
             steps{
-                echo '===== unning pytest inside container ====='
+                echo '============================== Running pytest inside container =============================='
                 sh 'docker run --rm ci-cd-project python -m pytest tests/ -v'
 
             }
@@ -28,11 +28,11 @@ pipeline{
 
         stage('Deploy container'){
             steps{
-                echo '===== removing old container if exists =====' 
+                echo ' ============================== removing old container if exists ============================== ' 
                 sh 'docker stop flask-web-app || true'
                 sh 'docker rm flask-web-app || true' 
                 
-                echo '===== Deploying new container =====' 
+                echo ' ============================== Deploying new container ============================== ' 
                 sh 'docker run -d \
                     -p 5000:5000 \
                     --name flask-web-app \
